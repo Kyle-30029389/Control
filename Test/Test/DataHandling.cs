@@ -28,7 +28,7 @@ namespace Handling
                 AutoResetEvent autoEvent = (AutoResetEvent)stateInfo;
                 command = $"{Format(tickdata.servo2)}{Format(tickdata.servo3)}{Format(tickdata.servo1)}{Format(tickdata.servo4)}";
                 connection.SendMessage(command);
-                Console.WriteLine(command);
+                //Console.WriteLine(command);
             }
             
         }

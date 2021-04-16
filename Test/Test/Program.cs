@@ -10,8 +10,8 @@ namespace Test
     {
         static void Main(string[] arg)
         {
-            
 
+            bool change = true;
             var autoEvent = new AutoResetEvent(false);
 
             var tick = new Tick();
@@ -23,6 +23,7 @@ namespace Test
             
             var handlingTimer = new Timer(handling.MakeCommand,
                                     autoEvent, 0, 1);
+            
 
             // Initialize DirectInput
             var directInput = new DirectInput();
@@ -51,6 +52,11 @@ namespace Test
             // Instantiate the joystick
             var joystick = new Joystick(directInput, joystickGuid);
 
+            var controller = new Controller(joystick);
+            var buttonTimer = new Timer(controller.Switch,
+                                    autoEvent, 0, 100);
+
+
             Console.WriteLine("Found Joystick/Gamepad with GUID: {0}", joystickGuid);
 
             // Query all suported ForceFeedback effects
@@ -65,48 +71,54 @@ namespace Test
             joystick.Acquire();
 
             // Poll events from joystick
-
             while (true)
             {
                 joystick.Poll();
-                var datas = joystick.GetBufferedData();
-                foreach (var state in datas)
-                {
-                    if (state.Offset == JoystickOffset.X)
-                    {
-                        tick.servo1Change = (int)Math.Round((state.Value - 32768) * 0.0002);
-                    }
+                var state = joystick.GetCurrentState();
 
-                    if (state.Offset == JoystickOffset.Y)
-                    {
-                        tick.servo2Change = (int)Math.Round((state.Value - 32768) * 0.0002);
-                    }
+                //if (state.Buttons[1] == true)
+                //{
+                //    if (change)
+                //    {
+                //        change = false;
+                //    }
+                //    else
+                //    {
+                //        change = true;
+                //    }
+                //}
 
-                    if (state.Offset == JoystickOffset.Z)
-                    {
-                        tick.speed = (float)(((state.Value * -0.0008) + 53)/15);
+                tick.servo2Change = (int)Math.Round((state.X - 32768) * -0.0002);
+
+                //if (state.Offset == JoystickOffset.Buttons6)
+                //{
+                //    Console.WriteLine($"TriggerOpen :{(state.Value)}");
+                //}
+                //if (state.Offset == JoystickOffset.Buttons0)
+                //{
+                //    Console.WriteLine($"TriggerClose :{(state.Value)}");
+                //}
+
+               
+
+              
+                tick.servo3Change = (int)Math.Round((state.Y - 32768) * -0.0002);
+
+                tick.servo1Change = (int)Math.Round((state.RotationZ - 32768) * 0.0002);
+
+                
+                        
+
+
+                    //if (state.Offset == JoystickOffset.Z)
+                    //{
+                    //    tick.speed = (float)(((state.Value * -0.0008) + 53)/5+1);
  
-                    }
-                    if (state.Offset == JoystickOffset.Buttons1)
-                    {
-                        Console.WriteLine($"Switch Mode :{(state.Value)}");
-                    }
-                    if (state.Offset == JoystickOffset.Buttons6)
-                    {
-                        Console.WriteLine($"TriggerOpen :{(state.Value)}");
-                    }
-                    if (state.Offset == JoystickOffset.Buttons0)
-                    {
-                        Console.WriteLine($"TriggerClose :{(state.Value)}");
-                    }
+                    //}
+                    
 
-                }
+                
             }
-
-
-
-
-  
         }
     }
 
